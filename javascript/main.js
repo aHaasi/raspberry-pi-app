@@ -230,16 +230,29 @@ function dbWebsiteScraper(){
     //     }
     // });
 
-    var req = new XMLHttpRequest();
-
-    req.open('GET', 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=9646&rt=1&input=%23008010382&boardType=dep&time=actual&productsFilter=11111&start=yes', true);
-    req.onreadystatechange = function() {
-        if (req.readyState === 4) {
-            console.log(req.responseText);
-        }
+    var postForm = { //Fetch form data
+        'name'     : 'test'
     };
-    req.setRequestHeader('Accept', 'application/json');
-    req.send();
+
+    $.ajax({ //Process the form using $.ajax()
+        type      : 'POST', //Method type
+        url       : 'php/test.php', //Your form processing file URL
+        data      : postForm, //Forms name
+        dataType  : 'json',
+        success   : function(data) {
+            console.log('data in php', data);
+            // if (!data.success) { //If fails
+            //     if (data.errors.name) { //Returned if any error from process.php
+            //         $('.throw_error').fadeIn(1000).html(data.errors.name); //Throw relevant error
+            //     }
+            // }
+            // else {
+            //     $('#success').fadeIn(1000).append('<p>' + data.posted + '</p>'); //If successful, than throw a success message
+            // }
+        }
+    });
+
+
 }
 
 // Create the XHR object.
