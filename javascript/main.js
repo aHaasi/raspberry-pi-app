@@ -220,6 +220,75 @@ function getBirthdayPeople(birthdayArray, searchedDate){
     return names;
 }
 
+function dbWebsiteScraper(){
+    // $.ajax({
+    //     url: "http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=9646&rt=1&input=%23008010382&boardType=dep&time=actual&productsFilter=11111&start=yes",
+    //     crossDomain: true,
+    //     dataType: 'text',
+    //     success: function(data) {
+    //         console.log('---data', data);
+    //     }
+    // });
+
+    var req = new XMLHttpRequest();
+
+    req.open('GET', 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=9646&rt=1&input=%23008010382&boardType=dep&time=actual&productsFilter=11111&start=yes', true);
+    req.onreadystatechange = function() {
+        if (req.readyState === 4) {
+            console.log(req.responseText);
+        }
+    };
+    req.setRequestHeader('Accept', 'application/json');
+    req.send();
+}
+
+// Create the XHR object.
+function createCORSRequest(method, url) {
+    var xhr = new XMLHttpRequest();
+    if ("withCredentials" in xhr) {
+        // XHR for Chrome/Firefox/Opera/Safari.
+        xhr.open(method, url, true);
+    } else if (typeof XDomainRequest != "undefined") {
+        // XDomainRequest for IE.
+        xhr = new XDomainRequest();
+        xhr.open(method, url);
+    } else {
+        // CORS not supported.
+        xhr = null;
+    }
+    return xhr;
+}
+
+// Helper method to parse the title tag from the response.
+function getTitle(text) {
+    return text.match('<title>(.*)?</title>')[1];
+}
+
+// Make the actual CORS request.
+function makeCorsRequest() {
+    // This is a sample server that supports CORS.
+    var url = 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=9646&rt=1&input=%23008010382&boardType=dep&time=actual&productsFilter=11111&start=yes';
+
+    var xhr = createCORSRequest('GET', url);
+    if (!xhr) {
+        alert('CORS not supported');
+        return;
+    }
+
+    // Response handlers.
+    xhr.onload = function() {
+        var text = xhr.responseText;
+        var title = getTitle(text);
+        alert('Response from CORS request to ' + url + ': ' + title);
+    };
+
+    xhr.onerror = function() {
+        alert('Woops, there was an error making the request.');
+    };
+
+    xhr.send();
+}
+
 $( document ).ready(function() {
     $('.pull-down').each(function() {
         var $this=$(this);
