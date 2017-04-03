@@ -1,0 +1,156 @@
+---
+layout: default
+---
+
+<script>
+    //weather
+    getWeather("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{site.data.weather.Wittenberge.id}}", "wittenberge");
+    getWeather("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{site.data.weather.Berlin.id}}", "berlin");
+
+    setWeatherInterval("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{site.data.weather.Wittenberge.id}}", "wittenberge");
+    setWeatherInterval("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{site.data.weather.Berlin.id}}", "berlin");
+
+    //forecast
+    getForecast("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{site.data.weather.Wittenberge.id}}", "wittenberge");
+    getForecast("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{site.data.weather.Berlin.id}}", "berlin");
+
+    setForecastIntervall("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{site.data.weather.Wittenberge.id}}", "wittenberge");
+    setForecastIntervall("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{site.data.weather.Berlin.id}}", "berlin");
+
+    $( document ).ready(function() {
+        getCurrentBirthday('{{site.data.birthdays.birthdays}}');
+
+    });
+</script>
+
+<div class="home">
+
+  <div class="background">
+    <div class="container">
+      <div class="row birthday margin-bottom">
+        <div class="col-md-5"></div>
+        <div class="col-md-5 border-radius birthday-container small-margin-left">
+          <div class="row">
+            <div class="col-md-2">
+              <img class="small-margin-left" src="{{base}}/images/icons/32/001-present.png"/>
+            </div>
+            <div class="col-md-8">
+              <p class="currentBirthday white-color"><span class="birthday-start-text"></span><b class="birthday-people"></b><span class="birthday-end-text"></span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row weather">
+        <div class="col-md-5 weather-container border-radius wittenberge">
+          <div class="row">
+            <div class="col-md-8">
+              <p class="white-color">Wittenberge</p>
+              <div class="row">
+                <div class="col-md-5">
+                  <img class="center-block weatherCurrentImg" src="{{base}}/images/icons/128/007-weather-1.png"/>
+                </div>
+                <div class="col-md-4">
+                  <p class="text-left white-color weather-font currentTemp"/>
+                </div>
+              </div>
+              <div class="row margin-top">
+                <div class="col-md-4">
+                  <p class="text-center white-color"><span class="currentTempMin"></span><span class="big-font currentTempMax"></span></p>
+                </div>
+                <div class="col-md-6">
+                  <p class="text-left white-color currentWeather"/>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 border-left-side">
+              <div class="row">
+                <div class="col-md-5">
+                  <p class="white-color">Morgen</p>
+                  <img class="weatherTomorrowImg" src="{{base}}/images/icons/32/01d.png"/>
+                </div>
+                <div class="col-md-7 pull-down">
+                  <p class="white-color"><span class="weatherTomorrowTempMin"></span><span class="weatherTomorrowTempMax"></span></p>
+                </div>
+              </div>
+              <hr class="small-margin-top">
+              <div class="row">
+                <div class="col-md-5">
+                  <p class="white-color weatherIn2DaysDate"></p>
+                  <img class="weatherIn2DaysImg" src="{{base}}/images/icons/32/01d.png"/>
+                </div>
+                <div class="col-md-7 pull-down">
+                  <p class="white-color"><span class="weatherIn2DaysTempMin"></span><span class="weatherIn2DaysTempMax"></span></p>
+                </div>
+              </div>
+              <hr class="small-margin-top">
+              <div class="row">
+                <div class="col-md-5">
+                  <p class="white-color weatherIn3DaysDate"></p>
+                  <img class="weatherIn3DaysImg" src="{{base}}/images/icons/32/01d.png"/>
+                </div>
+                <div class="col-md-7 pull-down">
+                  <p class="white-color"><span class="weatherIn3DaysTempMin"></span><span class="weatherIn3DaysTempMax"></span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5 weather-container border-radius berlin small-margin-left">
+          <div class="row">
+            <div class="col-md-8">
+              <p class="white-color">Berlin</p>
+              <div class="row">
+                <div class="col-md-5">
+                  <img class="center-block weatherCurrentImg" src="{{base}}/images/icons/128/007-weather-1.png"/>
+                </div>
+                <div class="col-md-4">
+                  <p class="text-left white-color weather-font currentTemp"/>
+                </div>
+              </div>
+              <div class="row margin-top">
+                <div class="col-md-4">
+                  <p class="text-center white-color"><span class="currentTempMin"></span><span class="big-font currentTempMax"></span></p>
+                </div>
+                <div class="col-md-6">
+                  <p class="text-left white-color currentWeather"/>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 border-left-side">
+              <div class="row">
+                <div class="col-md-5">
+                  <p class="white-color">Morgen</p>
+                  <img class="weatherTomorrowImg" src="{{base}}/images/icons/32/01d.png"/>
+                </div>
+                <div class="col-md-7 pull-down">
+                  <p class="white-color"><span class="weatherTomorrowTempMin"></span><span class="weatherTomorrowTempMax"></span></p>
+                </div>
+              </div>
+              <hr class="small-margin-top">
+              <div class="row">
+                <div class="col-md-5">
+                  <p class="white-color weatherIn2DaysDate"></p>
+                  <img class="weatherIn2DaysImg" src="{{base}}/images/icons/32/01d.png"/>
+                </div>
+                <div class="col-md-7 pull-down">
+                  <p class="white-color"><span class="weatherIn2DaysTempMin"></span><span class="weatherIn2DaysTempMax"></span></p>
+                </div>
+              </div>
+              <hr class="small-margin-top">
+              <div class="row">
+                <div class="col-md-5">
+                  <p class="white-color weatherIn3DaysDate"></p>
+                  <img class="weatherIn3DaysImg" src="{{base}}/images/icons/32/01d.png"/>
+                </div>
+                <div class="col-md-7 pull-down">
+                  <p class="white-color"><span class="weatherIn3DaysTempMin"></span><span class="weatherIn3DaysTempMax"></span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
