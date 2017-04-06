@@ -1,0 +1,11 @@
+- name: Berlin
+  weatherId: 7290254
+  stationId:
+  stationType: departure
+  stationName: Berlin Hbf
+
+- name: Wittenberge
+  weatherId: 2807344
+  stationId: 008010382
+  stationType: arrival
+  stationName: Wittenberge

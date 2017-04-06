@@ -12,6 +12,7 @@ var translation = [
     {en: "overcast clouds", de: "Dichte Wolkendecke"}
 ];
 var millisecondsToWait = 150000;
+var departureStation, arrivalStation, searchedCity;
 
 function getWeather(apiUrl, apiId, id, cityName){
     $.getJSON(apiUrl + "/weather?id="+id+"&&units=metric&APPID="+apiId, function( data ) {
@@ -220,86 +221,140 @@ function getBirthdayPeople(birthdayArray, searchedDate){
     return names;
 }
 
-function dbWebsiteScraper(){
-    // $.ajax({
-    //     url: "http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=9646&rt=1&input=%23008010382&boardType=dep&time=actual&productsFilter=11111&start=yes",
-    //     crossDomain: true,
-    //     dataType: 'text',
-    //     success: function(data) {
-    //         console.log('---data', data);
-    //     }
-    // });
+function getCurrentTrains(departure, arrival, cityName){
+    departureStation = departure;
+    arrivalStation = arrival;
+    searchedCity = cityName;
+    $.ajax({
+        url: 'http://localhost/currentTrains.php',
+        // url: "http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=9646&rt=1&input=%23008010382&boardType=dep&time=actual&productsFilter=11111&start=yes",
+        success: function(data) {
+            requestTrainDetails(getTrains(data));
 
-    var postForm = { //Fetch form data
-        'name'     : 'test'
-    };
-
-    $.ajax({ //Process the form using $.ajax()
-        type      : 'POST', //Method type
-        url       : 'php/test.php', //Your form processing file URL
-        data      : postForm, //Forms name
-        dataType  : 'json',
-        success   : function(data) {
-            console.log('data in php', data);
-            // if (!data.success) { //If fails
-            //     if (data.errors.name) { //Returned if any error from process.php
-            //         $('.throw_error').fadeIn(1000).html(data.errors.name); //Throw relevant error
-            //     }
-            // }
-            // else {
-            //     $('#success').fadeIn(1000).append('<p>' + data.posted + '</p>'); //If successful, than throw a success message
-            // }
         }
     });
 
-
 }
 
-// Create the XHR object.
-function createCORSRequest(method, url) {
-    var xhr = new XMLHttpRequest();
-    if ("withCredentials" in xhr) {
-        // XHR for Chrome/Firefox/Opera/Safari.
-        xhr.open(method, url, true);
-    } else if (typeof XDomainRequest != "undefined") {
-        // XDomainRequest for IE.
-        xhr = new XDomainRequest();
-        xhr.open(method, url);
-    } else {
-        // CORS not supported.
-        xhr = null;
+function getTrains(data){
+    var start = data.indexOf('<table class="result stboard dep"');
+    var end = data.indexOf('</table>', data.indexOf('<table class="result stboard dep"'));
+    var dataList = [];
+    if(start > -1 && end >-1){
+        var tableOfResult = data.substring(start, end);
+        var htmlObject = $.parseHTML(tableOfResult);
+        var children = htmlObject[0].children[0].children;
+        for(var i=0; i<children.length; i++){
+            var child = children[i];
+            if(child.id.indexOf('journeyRow') > -1){
+                console.log('searched', searchedCity);
+                if(checkSearchedTrainStationIsIn(searchedCity, child.children)){
+                    dataList.push({
+                        id: getIdOfTrain(child.children),
+                        url: getUrlOfTrain(child.children)
+                    });
+                }
+            }
+        }
     }
-    return xhr;
+    return dataList;
+
 }
 
-// Helper method to parse the title tag from the response.
-function getTitle(text) {
-    return text.match('<title>(.*)?</title>')[1];
-}
-
-// Make the actual CORS request.
-function makeCorsRequest() {
-    // This is a sample server that supports CORS.
-    var url = 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=9646&rt=1&input=%23008010382&boardType=dep&time=actual&productsFilter=11111&start=yes';
-
-    var xhr = createCORSRequest('GET', url);
-    if (!xhr) {
-        alert('CORS not supported');
-        return;
+function checkSearchedTrainStationIsIn(trainStation, children){
+    for(var i=0; i<children.length; i++){
+        var child = children[i];
+        if(child.className === "route"){
+            if(child.innerText.indexOf(trainStation)>-1){
+                return true;
+            }
+        }
     }
+    return false;
+}
 
-    // Response handlers.
-    xhr.onload = function() {
-        var text = xhr.responseText;
-        var title = getTitle(text);
-        alert('Response from CORS request to ' + url + ': ' + title);
-    };
+function getUrlOfTrain(children){
+    for(var i=0; i<children.length; i++){
+        var child = children[i];
+        if(child.className === "train"){
+            for(var j=0; j<child.children.length; j++){
+                if(child.children[j].localName === 'a'){
+                    var linkChild = child.children[j];
+                    if(linkChild.href.indexOf('localhost') === -1){
+                        return linkChild.href;
+                    }
+                }
+            }
+        }
+    }
+    return null;
+}
 
-    xhr.onerror = function() {
-        alert('Woops, there was an error making the request.');
-    };
+function getIdOfTrain(children){
+    for(var i=0; i<children.length; i++){
+        var child = children[i];
+        if(child.className === "train"){
+            for(var j=0; j<child.children.length; j++){
+                if(child.children[j].localName === 'a'){
+                    var linkChild = child.children[j];
+                    if(linkChild.href.indexOf('localhost') > -1){
+                        return linkChild.innerHTML;
+                    }
+                }
+            }
+        }
+    }
+    return null;
+}
 
-    xhr.send();
+function requestTrainDetails(trains){
+    console.log('trains', trains);
+    for(var i=0; i<trains.length; i++){
+        var data = trains[i];
+
+        $.ajax({ //Process the form using $.ajax()
+            type      : 'POST', //Method type
+            url       : 'http://localhost/trainDetails.php', //Your form processing file URL
+            data      : data, //Forms name
+            dataType  : 'json',
+            success   : function(data) {
+                var htmlElem = data.html;
+                var start = htmlElem.indexOf('<table class="result stboard train"');
+                var end = htmlElem.indexOf('</table>', htmlElem.indexOf('<table class="result stboard train"'));
+                if(start > -1 && end >-1){
+                    var tableOfResult = htmlElem.substring(start, end);
+                    var htmlObject = $.parseHTML(tableOfResult);
+                    var children = htmlObject[0].children[0].children;
+                    if(children){
+                        var startStation = getDataOfStation(arrivalStation, children, false);
+                        var endStation = getDataOfStation(departureStation, children, true);
+                        console.log('stations', startStation, endStation);
+                    }
+                }
+            }
+        });
+    }
+}
+
+function getDataOfStation(stationName, children, isDeparture){
+    for(var i=0; i<children.length; i++){
+        var childTr = children[i];
+        if(childTr.innerText.indexOf(stationName)> -1){
+            var data = {};
+            for(var j=0; j<childTr.children.length; j++){
+                var info = childTr.children[j];
+                if(info.className === 'station'){
+                    data.station = info.innerText;
+                }else if(info.className === 'ris'){
+                    data.delay = info.innerText;
+                }else if(isDeparture && info.className.indexOf('departure') > -1){
+                    data.time = info.innerText;
+                }else if(!isDeparture && info.className.indexOf('arrival') > -1){
+                    data.time = info.innerText;
+                }
+            }
+        }
+    }
 }
 
 $( document ).ready(function() {
