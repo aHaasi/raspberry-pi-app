@@ -6,7 +6,7 @@ layout: default
     $( document ).ready(function() {
         //weather
 
-        var departureStation, arrivalStation, searchedCity, departureStationId;
+        var departureStation, arrivalStation, searchedCity, departureStationId, otherStations;
         {% for city in site.data.cities %}
           getWeather("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{city.weatherId}}", "{{city.name}}");
           setWeatherInterval("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{city.weatherId}}", "{{city.name}}");
@@ -20,13 +20,18 @@ layout: default
           }else{
             arrivalStation = "{{city.stationName}}";
             searchedCity = "{{city.name}}";
+            otherStations = "{{city.otherStations}}";
           }
         {% endfor %}
 
         getCurrentBirthday('{{site.data.birthdays.birthdays}}');
+        setBirthdayInterval('{{site.data.birthdays.birthdays}}');
 
-        getCurrentTrains(departureStation, arrivalStation, searchedCity, departureStationId);
-        setTrainInterval(departureStation, arrivalStation, searchedCity, departureStationId);
+        getCurrentTrains(departureStation, arrivalStation, searchedCity, departureStationId, otherStations);
+        setTrainInterval(departureStation, arrivalStation, searchedCity, departureStationId, otherStations);
+
+        setCurrentDateTime();
+        setCurrentDateTimeInterval();
 
     });
 </script>
@@ -35,14 +40,21 @@ layout: default
 
   <div class="background">
     <div class="container">
+      <div class="row">
+        <div class="col-md-9"></div>
+        <div class="col-md-2 text-right">
+          <p><span class="current-time">14:02</span> <span class="current-date">9.04.2017</span></p>
+        </div>
+      </div>
       <div class="row margin-bottom">
+        <div class="col-md-1"></div>
         <div class="col-md-6 train-container border-radius">
           <div class="row">
             <div class="col-md-2 no-padding-right">
               <img class="small-margin-left" src="images/icons/32/002-transport-2.png"/>
             </div>
             <div class="col-md-8 no-padding-left">
-              <p><b>Zugverbindung:</b> <span class="startStation">Wittenberge</span><span class="arrow small-margin-left glyphicon glyphicon-arrow-right"></span><span class="endStation small-margin-left">Berlin</span></p>
+              <p><b>Zugverbindungen:</b> <span class="startStation">Wittenberge</span><span class="arrow small-margin-left glyphicon glyphicon-arrow-right"></span><span class="endStation small-margin-left">Berlin</span></p>
             </div>
           </div>
           <div class="train-details">
@@ -101,6 +113,7 @@ layout: default
         {% capture modulo %}{{ forloop.index0 | modulo:2 }}{% endcapture %}
         {% if modulo == '0' %}
       <div class="row weather">
+        <div class="col-md-1"></div>
         {% endif %}
         <div {% if site.data.cities.size == 1 %} class="col-md-12 uebersicht-element" {% else %} class="col-md-5 weather-container border-radius {{city.name}} {% if modulo == '1' %}small-margin-left{% endif %}" {% endif %}>
             <div class="row">

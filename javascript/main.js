@@ -13,7 +13,31 @@ var translation = [
 ];
 var millisecondsToWaitWeather = 900000;
 var millisecondsTrains = 120000;
-var departureStation, arrivalStation, searchedCity;
+var millisecondsForTime = 10000;
+var millisecondsToWaitBirthday = 600000;
+var departureStation, arrivalStation, searchedCity, otherStationsArray;
+
+// For todays date;
+Date.prototype.today = function () {
+    return ((this.getDate() < 10)?"0":"") + this.getDate() +"."+(((this.getMonth()+1) < 10)?"0":"") + (this.getMonth()+1) +"."+ this.getFullYear();
+}
+
+// For the time now
+Date.prototype.timeNow = function () {
+    return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes();
+}
+
+function setCurrentDateTime(){
+    var newDate = new Date();
+    $('.current-date').text(newDate.today());
+    $('.current-time').text(newDate.timeNow());
+}
+
+function setCurrentDateTimeInterval(){
+    setInterval(function() {
+        setCurrentDateTime();
+    }, millisecondsForTime);
+}
 
 function getWeather(apiUrl, apiId, id, cityName){
     $.getJSON(apiUrl + "/weather?id="+id+"&&units=metric&APPID="+apiId, function( data ) {
@@ -179,6 +203,12 @@ function getCurrentBirthday(birthdays){
     $(".birthday-end-text").text(' Geburtstag');
 }
 
+function setBirthdayInterval(birthdays){
+    setInterval(function() {
+        getCurrentBirthday(birthdays);
+    }, millisecondsToWaitBirthday);
+}
+
 /**
  * Format the yml file and save all birthdays in an array.
  * @param birthdays
@@ -227,17 +257,23 @@ function getBirthdayPeople(birthdayArray, searchedDate){
  * @param departure
  * @param arrival
  * @param cityName
- * @param arrivalStationId
+ * @param departureStationId
+ * @param otherStations
  */
-function getCurrentTrains(departure, arrival, cityName, departureStationId){
+function getCurrentTrains(departure, arrival, cityName, departureStationId, otherStations){
     departureStation = departure;
     arrivalStation = arrival;
     searchedCity = cityName;
-    $('.train-details').empty();
 
-    var data = {
-        url: 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=9646&rt=1&input=%23008010382&boardType=dep&time=actual&productsFilter=11111&start=yes'
-    };
+    if(otherStations){
+        otherStationsArray = otherStations.split(',');
+
+        for(var i=0; i<otherStationsArray.length; i++){
+            otherStationsArray[i] = otherStationsArray[i].trim();
+        }
+    }
+
+    $('.train-details').empty();
     $.ajax({
         url: 'http://localhost/currentTrains.php?id='+departureStationId,
         success: function(data) {
@@ -274,6 +310,15 @@ function getTrains(data){
                         id: removeReturnCharacter(getIdOfTrain(child.children)),
                         url: getUrlOfTrain(child.children)
                     });
+                }else{
+                    for(var j=0; j<otherStationsArray.length; j++){
+                        if(checkSearchedTrainStationIsIn(otherStationsArray[j], child.children)){
+                            dataList.push({
+                                id: removeReturnCharacter(getIdOfTrain(child.children)),
+                                url: getUrlOfTrain(child.children)
+                            });
+                        }
+                    }
                 }
             }
         }
@@ -471,11 +516,13 @@ function appendTrainDataToContainer(trainData){
 function getTrainConnectionContainer(trainData){
     var startStationDelay = '';
     if(trainData.startStation.delay){
-        startStationDelay = '<span class="departureDelay">'+ trainData.startStation.delay +'</span>';
+        var delayColor = getColorOfDelay(trainData.startStation.delay);
+        startStationDelay = '<span class="departureDelay '+ delayColor +'">'+ trainData.startStation.delay +'</span>';
     }
     var endStationDelay = '';
     if(trainData.endStation.delay){
-        endStationDelay = '<span class="arrivalDelay">'+ trainData.endStation.delay +'</span>';
+        var delayColor = getColorOfDelay(trainData.endStation.delay);
+        endStationDelay = '<span class="arrivalDelay '+ delayColor +'">'+ trainData.endStation.delay +'</span>';
     }
 
     var container = '<div class="train-connection border-radius"><div class="row"><div class="col-md-2 no-padding-right">'+
@@ -491,6 +538,21 @@ function getTrainConnectionContainer(trainData){
         '</div></div></div>';
 
     return container;
+}
+
+function getColorOfDelay(delay){
+    if(delay.indexOf('+')> -1){
+        delay = delay.replace('+', '');
+        var delayInInt = parseInt(delay);
+        if(delayInInt){
+            if(delayInInt > 5){
+                return 'red-color';
+            }else{
+                return 'green-color';
+            }
+        }
+    }
+    return 'green-color';
 }
 
 $( document ).ready(function() {
