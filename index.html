@@ -6,7 +6,7 @@ layout: default
     $( document ).ready(function() {
         //weather
 
-        var departureStation, arrivalStation, searchedCity;
+        var departureStation, arrivalStation, searchedCity, departureStationId;
         {% for city in site.data.cities %}
           getWeather("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{city.weatherId}}", "{{city.name}}");
           setWeatherInterval("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{city.weatherId}}", "{{city.name}}");
@@ -16,15 +16,17 @@ layout: default
 
           if("departure" === "{{city.stationType}}"){
               departureStation = "{{city.stationName}}";
-              searchedCity = "{{city.name}}";
+              departureStationId = "{{city.stationId}}";
           }else{
-            arrivalStation == "{{city.stationName}}";
+            arrivalStation = "{{city.stationName}}";
+            searchedCity = "{{city.name}}";
           }
         {% endfor %}
 
         getCurrentBirthday('{{site.data.birthdays.birthdays}}');
 
-        getCurrentTrains(departureStation, arrivalStation, searchedCity);
+        getCurrentTrains(departureStation, arrivalStation, searchedCity, departureStationId);
+        setTrainInterval(departureStation, arrivalStation, searchedCity, departureStationId);
 
     });
 </script>
@@ -33,15 +35,63 @@ layout: default
 
   <div class="background">
     <div class="container">
-      <div class="row birthday margin-bottom">
-        <div class="col-md-5"></div>
-        <div class="col-md-5 border-radius birthday-container small-margin-left">
+      <div class="row margin-bottom">
+        <div class="col-md-6 train-container border-radius">
+          <div class="row">
+            <div class="col-md-2 no-padding-right">
+              <img class="small-margin-left" src="images/icons/32/002-transport-2.png"/>
+            </div>
+            <div class="col-md-8 no-padding-left">
+              <p><b>Zugverbindung:</b> <span class="startStation">Wittenberge</span><span class="arrow small-margin-left glyphicon glyphicon-arrow-right"></span><span class="endStation small-margin-left">Berlin</span></p>
+            </div>
+          </div>
+          <div class="train-details">
+            <div class="train-connection border-radius">
+              <div class="row">
+                <div class="col-md-2 no-padding-right">
+                  <p><b>ICE 125</b></p>
+                </div>
+                <div class="col-md-1 no-padding-left">
+                  <img src="images/icons/32/003-symbol.png"/>
+                </div>
+                <div class="col-md-3 no-padding-left text-center">
+                  <p class="arrivalStation">Wittenberge</p>
+                </div>
+                <div class="col-md-2 no-padding-left">
+                  <img src="images/icons/32/arrows.png"/>
+                </div>
+                <div class="col-md-1 no-padding-left">
+                  <img src="images/icons/32/002-car.png"/>
+                </div>
+                <div class="col-md-3 no-padding-left text-center">
+                  <p class="departureStation">Berlin</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-2 no-padding-right">
+                </div>
+                <div class="col-md-1 no-padding-left"></div>
+                <div class="col-md-3 no-padding-left text-center">
+                  <p class="arrivalTime">6:31 Uhr <span class="arrivalDelay">+0</span></p>
+                </div>
+                <div class="col-md-2 no-padding-left">
+                </div>
+                <div class="col-md-1 no-padding-left">
+                </div>
+                <div class="col-md-3 no-padding-left text-center">
+                  <p class="departureTime">7:20 Uhr <span class="departureDelay">+0</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 border-radius birthday-container small-margin-left">
           <div class="row">
             <div class="col-md-2">
-              <img class="small-margin-left" src="{{base}}/images/icons/32/001-present.png"/>
+              <img class="small-margin-left" src="images/icons/32/001-present.png"/>
             </div>
             <div class="col-md-8">
-              <p class="currentBirthday white-color"><span class="birthday-start-text"></span><b class="birthday-people"></b><span class="birthday-end-text"></span></p>
+              <p class="currentBirthday"><span class="birthday-start-text"></span><b class="birthday-people"></b><span class="birthday-end-text"></span></p>
             </div>
           </div>
         </div>
@@ -55,52 +105,52 @@ layout: default
         <div {% if site.data.cities.size == 1 %} class="col-md-12 uebersicht-element" {% else %} class="col-md-5 weather-container border-radius {{city.name}} {% if modulo == '1' %}small-margin-left{% endif %}" {% endif %}>
             <div class="row">
               <div class="col-md-8">
-                <p class="white-color"><b>{{city.name}}</b></p>
+                <p><b>{{city.name}}</b></p>
                 <div class="row">
                   <div class="col-md-5">
-                    <img class="center-block weatherCurrentImg" src="{{base}}/images/icons/128/007-weather-1.png"/>
+                    <img class="center-block weatherCurrentImg" src="images/icons/128/007-weather-1.png"/>
                   </div>
                   <div class="col-md-4">
-                    <p class="text-left white-color weather-font currentTemp"/>
+                    <p class="text-left weather-font currentTemp"/>
                   </div>
                 </div>
                 <div class="row margin-top">
                   <div class="col-md-4">
-                    <p class="text-center white-color"><span class="currentTempMin"></span><span class="big-font currentTempMax"></span></p>
+                    <p class="text-center"><span class="currentTempMin"></span><span class="big-font currentTempMax"></span></p>
                   </div>
                   <div class="col-md-6">
-                    <p class="text-left white-color currentWeather"/>
+                    <p class="text-left currentWeather"/>
                   </div>
                 </div>
               </div>
               <div class="col-md-4 border-left-side">
                 <div class="row">
                   <div class="col-md-5">
-                    <p class="white-color">Morgen</p>
-                    <img class="weatherTomorrowImg" src="{{base}}/images/icons/32/01d.png"/>
+                    <p>Morgen</p>
+                    <img class="weatherTomorrowImg" src="images/icons/32/01d.png"/>
                   </div>
                   <div class="col-md-7 pull-down">
-                    <p class="white-color"><span class="weatherTomorrowTempMin"></span><span class="weatherTomorrowTempMax"></span></p>
+                    <p><span class="weatherTomorrowTempMin"></span><span class="weatherTomorrowTempMax"></span></p>
                   </div>
                 </div>
                 <hr class="small-margin-top">
                 <div class="row">
                   <div class="col-md-5">
-                    <p class="white-color weatherIn2DaysDate"></p>
-                    <img class="weatherIn2DaysImg" src="{{base}}/images/icons/32/01d.png"/>
+                    <p class="weatherIn2DaysDate"></p>
+                    <img class="weatherIn2DaysImg" src="images/icons/32/01d.png"/>
                   </div>
                   <div class="col-md-7 pull-down">
-                    <p class="white-color"><span class="weatherIn2DaysTempMin"></span><span class="weatherIn2DaysTempMax"></span></p>
+                    <p><span class="weatherIn2DaysTempMin"></span><span class="weatherIn2DaysTempMax"></span></p>
                   </div>
                 </div>
                 <hr class="small-margin-top">
                 <div class="row">
                   <div class="col-md-5">
-                    <p class="white-color weatherIn3DaysDate"></p>
-                    <img class="weatherIn3DaysImg" src="{{base}}/images/icons/32/01d.png"/>
+                    <p class="weatherIn3DaysDate"></p>
+                    <img class="weatherIn3DaysImg" src="images/icons/32/01d.png"/>
                   </div>
                   <div class="col-md-7 pull-down">
-                    <p class="white-color"><span class="weatherIn3DaysTempMin"></span><span class="weatherIn3DaysTempMax"></span></p>
+                    <p><span class="weatherIn3DaysTempMin"></span><span class="weatherIn3DaysTempMax"></span></p>
                   </div>
                 </div>
               </div>

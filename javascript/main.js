@@ -11,7 +11,8 @@ var translation = [
     {en: "light rain", de: "Leichter Regen"},
     {en: "overcast clouds", de: "Dichte Wolkendecke"}
 ];
-var millisecondsToWait = 150000;
+var millisecondsToWaitWeather = 900000;
+var millisecondsTrains = 120000;
 var departureStation, arrivalStation, searchedCity;
 
 function getWeather(apiUrl, apiId, id, cityName){
@@ -28,7 +29,7 @@ function getWeather(apiUrl, apiId, id, cityName){
 function setWeatherInterval(apiUrl, apiId, id, cityName){
     setInterval(function() {
         getWeather(apiUrl, apiId, id, cityName);
-    }, millisecondsToWait);
+    }, millisecondsToWaitWeather);
 }
 
 function getForecast(apiUrl, apiId, id, cityName){
@@ -64,7 +65,7 @@ function getForecast(apiUrl, apiId, id, cityName){
 function setForecastIntervall(apiUrl, apiId, id, cityName){
     setInterval(function() {
         getForecast(apiUrl, apiId, id, cityName);
-    }, millisecondsToWait);
+    }, millisecondsToWaitWeather);
 }
 
 function getIconSrc(currentImageUrl, imageName){
@@ -221,21 +222,42 @@ function getBirthdayPeople(birthdayArray, searchedDate){
     return names;
 }
 
-function getCurrentTrains(departure, arrival, cityName){
+/**
+ * Get the current trains. Send request to get all trains.
+ * @param departure
+ * @param arrival
+ * @param cityName
+ * @param arrivalStationId
+ */
+function getCurrentTrains(departure, arrival, cityName, departureStationId){
     departureStation = departure;
     arrivalStation = arrival;
     searchedCity = cityName;
+    $('.train-details').empty();
+
+    var data = {
+        url: 'http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=9646&rt=1&input=%23008010382&boardType=dep&time=actual&productsFilter=11111&start=yes'
+    };
     $.ajax({
-        url: 'http://localhost/currentTrains.php',
-        // url: "http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn?ld=9646&rt=1&input=%23008010382&boardType=dep&time=actual&productsFilter=11111&start=yes",
+        url: 'http://localhost/currentTrains.php?id='+departureStationId,
         success: function(data) {
             requestTrainDetails(getTrains(data));
 
         }
     });
-
 }
 
+function setTrainInterval(departure, arrival, cityName, arrivalStationId){
+    setInterval(function() {
+        getCurrentTrains(departure, arrival, cityName, arrivalStationId);
+    }, millisecondsTrains);
+}
+
+/**
+ * Filter the trains from table.
+ * @param data
+ * @returns {Array}
+ */
 function getTrains(data){
     var start = data.indexOf('<table class="result stboard dep"');
     var end = data.indexOf('</table>', data.indexOf('<table class="result stboard dep"'));
@@ -247,10 +269,9 @@ function getTrains(data){
         for(var i=0; i<children.length; i++){
             var child = children[i];
             if(child.id.indexOf('journeyRow') > -1){
-                console.log('searched', searchedCity);
                 if(checkSearchedTrainStationIsIn(searchedCity, child.children)){
                     dataList.push({
-                        id: getIdOfTrain(child.children),
+                        id: removeReturnCharacter(getIdOfTrain(child.children)),
                         url: getUrlOfTrain(child.children)
                     });
                 }
@@ -261,6 +282,12 @@ function getTrains(data){
 
 }
 
+/**
+ * Check if searched train station stands in children html elements.
+ * @param trainStation
+ * @param children
+ * @returns {boolean}
+ */
 function checkSearchedTrainStationIsIn(trainStation, children){
     for(var i=0; i<children.length; i++){
         var child = children[i];
@@ -273,6 +300,11 @@ function checkSearchedTrainStationIsIn(trainStation, children){
     return false;
 }
 
+/**
+ * Returns the url of details of train.
+ * @param children
+ * @returns {*}
+ */
 function getUrlOfTrain(children){
     for(var i=0; i<children.length; i++){
         var child = children[i];
@@ -290,6 +322,11 @@ function getUrlOfTrain(children){
     return null;
 }
 
+/**
+ * Return the id of the train.
+ * @param children
+ * @returns {*}
+ */
 function getIdOfTrain(children){
     for(var i=0; i<children.length; i++){
         var child = children[i];
@@ -307,28 +344,37 @@ function getIdOfTrain(children){
     return null;
 }
 
+/**
+ * Send request to get the train details. Save the data.
+ * @param trains
+ */
 function requestTrainDetails(trains){
-    console.log('trains', trains);
     for(var i=0; i<trains.length; i++){
-        var data = trains[i];
+        var sendData = trains[i];
 
-        $.ajax({ //Process the form using $.ajax()
+        $.ajax({
             type      : 'POST', //Method type
             url       : 'http://localhost/trainDetails.php', //Your form processing file URL
-            data      : data, //Forms name
+            data      : sendData, //Forms name
             dataType  : 'json',
             success   : function(data) {
                 var htmlElem = data.html;
                 var start = htmlElem.indexOf('<table class="result stboard train"');
                 var end = htmlElem.indexOf('</table>', htmlElem.indexOf('<table class="result stboard train"'));
+                var trainDetails = null;
                 if(start > -1 && end >-1){
                     var tableOfResult = htmlElem.substring(start, end);
                     var htmlObject = $.parseHTML(tableOfResult);
                     var children = htmlObject[0].children[0].children;
                     if(children){
-                        var startStation = getDataOfStation(arrivalStation, children, false);
-                        var endStation = getDataOfStation(departureStation, children, true);
-                        console.log('stations', startStation, endStation);
+                        var startStation = getDataOfStation(departureStation, children, true);
+                        var endStation = getDataOfStation(arrivalStation, children, false);
+                        trainDetails = {
+                            id: data.id,
+                            startStation: startStation,
+                            endStation: endStation
+                        };
+                        appendTrainDataToContainer(trainDetails);
                     }
                 }
             }
@@ -336,6 +382,13 @@ function requestTrainDetails(trains){
     }
 }
 
+/**
+ * Get the data of train from html elements. Returns the data.
+ * @param stationName
+ * @param children
+ * @param isDeparture
+ * @returns {{}}
+ */
 function getDataOfStation(stationName, children, isDeparture){
     for(var i=0; i<children.length; i++){
         var childTr = children[i];
@@ -344,17 +397,100 @@ function getDataOfStation(stationName, children, isDeparture){
             for(var j=0; j<childTr.children.length; j++){
                 var info = childTr.children[j];
                 if(info.className === 'station'){
-                    data.station = info.innerText;
-                }else if(info.className === 'ris'){
-                    data.delay = info.innerText;
+                    data.station = removeReturnCharacter(info.innerText);
                 }else if(isDeparture && info.className.indexOf('departure') > -1){
-                    data.time = info.innerText;
+                    data.time = removeDelay(removeReturnCharacter(info.innerText));
+                    if(info.children.length>0){
+                        data.delay = removeReturnCharacter(info.children[0].innerHTML);
+                    }
                 }else if(!isDeparture && info.className.indexOf('arrival') > -1){
-                    data.time = info.innerText;
+                    data.time = removeDelay(removeReturnCharacter(info.innerText));
+                    if(info.children.length>0){
+                        data.delay = removeReturnCharacter(info.children[0].innerHTML);
+                    }
+                }else if(info.className === 'ris'){
+                    data.info = removeUnusedString(info.innerHTML);
                 }
             }
+            return data;
         }
     }
+}
+
+/**
+ * Remove the delay from time.
+ * @param str
+ * @returns {*}
+ */
+function removeDelay(str){
+    if(str.indexOf('+')>-1){
+        return str.substring(0, str.indexOf('+'));
+    }else if(str.indexOf('-')>-1){
+        return str.substring(0, str.indexOf('-'));
+    }else{
+        return str;
+    }
+}
+
+/**
+ * Remove the new line character from string.
+ * @param str
+ * @returns {XML|string|void}
+ */
+function removeReturnCharacter(str){
+    return str.replace(/\r?\n|\r/g, "");
+}
+
+/**
+ * Remove the unused string from information of train.
+ * @param str
+ * @returns {XML|string|void}
+ */
+function removeUnusedString(str){
+    if(str.indexOf('&nbsp') -1){
+        return str.replace('&nbsp', '');
+    }
+}
+
+/**
+ * Add train data and container to html element.
+ * @param trainData
+ */
+function appendTrainDataToContainer(trainData){
+    if(trainData !== null){
+        var container = getTrainConnectionContainer(trainData);
+        $('.train-details').append(container);
+    }
+}
+
+/**
+ * Container with train details.
+ * @param trainData
+ * @returns {string}
+ */
+function getTrainConnectionContainer(trainData){
+    var startStationDelay = '';
+    if(trainData.startStation.delay){
+        startStationDelay = '<span class="departureDelay">'+ trainData.startStation.delay +'</span>';
+    }
+    var endStationDelay = '';
+    if(trainData.endStation.delay){
+        endStationDelay = '<span class="arrivalDelay">'+ trainData.endStation.delay +'</span>';
+    }
+
+    var container = '<div class="train-connection border-radius"><div class="row"><div class="col-md-2 no-padding-right">'+
+        '<p><b>' + trainData.id + '</b></p></div><div class="col-md-1 no-padding-left"><img src="images/icons/32/003-symbol.png"/>'+
+        '</div><div class="col-md-3 no-padding-left text-center"><p>'+ trainData.startStation.station +'</p>'+
+        '</div><div class="col-md-2 no-padding-left"><img src="images/icons/32/arrows.png"/></div>' +
+        '<div class="col-md-1 no-padding-left"><img src="images/icons/32/002-car.png"/></div>' +
+        '<div class="col-md-3 no-padding-left text-center"><p>'+ trainData.endStation.station +'</p></div></div>'+
+        '<div class="row"><div class="col-md-2 no-padding-right"> </div><div class="col-md-1 no-padding-left"></div>'+
+        '<div class="col-md-3 no-padding-left text-center"><p>'+ trainData.startStation.time +' Uhr ' + startStationDelay + '</p>' +
+        '</div><div class="col-md-2 no-padding-left"></div><div class="col-md-1 no-padding-left"></div>' +
+        '<div class="col-md-3 no-padding-left text-center"><p>'+ trainData.endStation.time +' Uhr '+ endStationDelay + '</p>' +
+        '</div></div></div>';
+
+    return container;
 }
 
 $( document ).ready(function() {

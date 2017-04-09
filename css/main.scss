@@ -50,6 +50,16 @@ $on-laptop:        800px;
         "layout",
         "syntax-highlighting"
 ;
+
+p{
+  color: white
+}
+.no-padding-left{
+  padding-left: 0px;
+}
+.no-padding-right{
+  padding-right: 0px;
+}
 .margin-top{
   margin-top: 20px;
 }
@@ -63,7 +73,7 @@ $on-laptop:        800px;
   margin-bottom: 20px;
 }
 .white-color{
-  color: white
+  color: white;
 }
 .border-left-side{
   border-left: 1px solid;
@@ -99,4 +109,15 @@ $on-laptop:        800px;
 }
 .currentBirthday{
   margin-top: 5px;
+}
+.train-container{
+  background-color: orange;
+  padding: 10px;
+}
+.train-container .train-connection{
+  border-style: solid;
+  margin: 5px;
+  border-width: 1px;
+  color: white;
+  padding: 10px 5px 5px 10px;
 }

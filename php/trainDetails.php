@@ -20,7 +20,9 @@ else { //If not, process the form, and return true on success
     $html = curl_exec( $curl_handle ); // Execute the request
     curl_close( $curl_handle );
 
+    $form_data['id'] = $_POST['id'];
     $form_data['html'] = $html;
+
 }
 
 //Return the data back to form.php
