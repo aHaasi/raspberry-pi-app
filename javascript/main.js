@@ -1,15 +1,15 @@
 var translation = [
-    {en: "clear sky", de: "Blauer Himmel"},
-    {en: "few clouds", de: "Wenig bewölkt"},
-    {en: "scattered clouds", de: "Bewölkt"},
-    {en: "broken clouds", de: "Durchbrochende Wolkendecke"},
-    {en: "shower rain", de: "Regenschauer"},
-    {en: "rain", de: "Regen"},
-    {en: "thunderstorm", de: "Gewitter"},
-    {en: "snow", de: "Schnee"},
-    {en: "mist", de: "Nebel"},
-    {en: "light rain", de: "Leichter Regen"},
-    {en: "overcast clouds", de: "Dichte Wolkendecke"}
+    {en: "clear sky", de: "Blauer Himmel", colorCls: "weather-sunny"},
+    {en: "few clouds", de: "Wenig bewölkt", colorCls: "weather-cloudy"},
+    {en: "scattered clouds", de: "Bewölkt", colorCls: "weather-cloudy"},
+    {en: "broken clouds", de: "Durchbrochende Wolkendecke", colorCls: "weather-sunny"},
+    {en: "shower rain", de: "Regenschauer", colorCls: "weather-rainy"},
+    {en: "rain", de: "Regen", colorCls: "weather-rainy"},
+    {en: "thunderstorm", de: "Gewitter", colorCls: "weather-thunder"},
+    {en: "snow", de: "Schnee", colorCls: "weather-snow"},
+    {en: "mist", de: "Nebel", colorCls: "weather-snow"},
+    {en: "light rain", de: "Leichter Regen", colorCls: "weather-rainy"},
+    {en: "overcast clouds", de: "Dichte Wolkendecke", colorCls: "weather-cloudy"}
 ];
 var millisecondsToWaitWeather = 900000;
 var millisecondsTrains = 120000;
@@ -45,9 +45,18 @@ function getWeather(apiUrl, apiId, id, cityName){
         $("."+cityName + " .currentTemp").text(Math.round(data.main.temp) + "°");
         var trans = getTranslation(weather.description);
         $("."+cityName + " .currentWeather").text(trans);
+        var colorCls = getWeatherCls(weather.description);
+        removeOldWeatherClass(cityName);
+        $("."+cityName).addClass(colorCls);
 
         setImage("."+cityName + " .weatherCurrentImg", weather.icon);
     });
+}
+
+function removeOldWeatherClass(cityName){
+    for(var i=0; i<translation.length; i++){
+        $("."+cityName).removeClass(translation[i].colorCls);
+    }
 }
 
 function setWeatherInterval(apiUrl, apiId, id, cityName){
@@ -163,6 +172,20 @@ function getTranslation(en){
     for(var i=0; i<translation.length; i++){
         if(translation[i].en === en){
             return translation[i].de;
+        }
+    }
+    return en;
+}
+
+/**
+ * Get the weather class of current weather
+ * @param en
+ * @returns {*}
+ */
+function getWeatherCls(en){
+    for(var i=0; i<translation.length; i++){
+        if(translation[i].en === en){
+            return translation[i].colorCls;
         }
     }
     return en;

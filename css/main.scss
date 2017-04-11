@@ -40,6 +40,12 @@ $element-color9: #5371A9;
 $element-color10: #007F97;
 $element-color11: #00707F;
 
+$weather-sunny: #ffd36d;
+$weather-rainy: #5371A9;
+$weather-cloudy: #529acc;
+$weather-thunder: #474768;
+$weather-snow: #9ad3d6;
+
 // Using media queries with like this:
 // @include media-query($on-palm) {
 //     .wrapper {
@@ -124,7 +130,7 @@ p{
   padding: 10px;
 }
 .Berlin{
-  background-color: $element-color2;
+  background-color: $element-color9;
 }
 .birthday-container{
   padding: 10px;
@@ -149,4 +155,21 @@ p{
 }
 .green-color{
   color: green;
+}
+
+//Weather background
+.weather-sunny{
+  background-color: $weather-sunny;
+}
+.weather-rainy{
+  background-color: $weather-rainy;
+}
+.weather-cloudy{
+  background-color: $weather-cloudy;
+}
+.weather-thunder{
+  background-color: $weather-thunder;
+}
+.weather-snow{
+  background-color: $weather-snow;
 }

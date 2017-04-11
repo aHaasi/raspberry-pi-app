@@ -508,7 +508,7 @@ p {
   padding: 10px; }
 
 .Berlin {
-  background-color: #6D70FF; }
+  background-color: #5371A9; }
 
 .birthday-container {
   padding: 10px;
@@ -533,3 +533,18 @@ p {
 
 .green-color {
   color: green; }
+
+.weather-sunny {
+  background-color: #ffd36d; }
+
+.weather-rainy {
+  background-color: #5371A9; }
+
+.weather-cloudy {
+  background-color: #529acc; }
+
+.weather-thunder {
+  background-color: #474768; }
+
+.weather-snow {
+  background-color: #9ad3d6; }
