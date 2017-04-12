@@ -452,7 +452,12 @@ body {
   background-color: #20253D; }
 
 p {
-  color: white; }
+  color: white;
+  font-weight: bold; }
+
+.container {
+  padding-right: 0px;
+  padding-left: 0px; }
 
 .no-padding-left {
   padding-left: 0px; }
@@ -483,11 +488,11 @@ p {
   border-radius: 10px; }
 
 .current-date {
-  font-size: 15px;
+  font-size: 20px;
   color: #00707F; }
 
 .current-time {
-  font-size: 25px;
+  font-size: 35px;
   color: #007F97; }
 
 .weather-font {
@@ -517,6 +522,9 @@ p {
 .currentBirthday {
   margin-top: 5px; }
 
+.birthday-people {
+  color: #20253D; }
+
 .train-container {
   background-color: #52C7C9;
   padding: 10px; }
@@ -535,7 +543,7 @@ p {
   color: green; }
 
 .weather-sunny {
-  background-color: #ffce41; }
+  background-color: #ffc82c; }
 
 .weather-rainy {
   background-color: #5371A9; }
