@@ -42,12 +42,12 @@ layout: default
     <div class="container">
       <div class="row">
         <div class="col-md-8"></div>
-        <div class="col-md-4 text-right">
+        <div class="col-md-4 text-right no-padding-right">
           <p><span class="current-time"></span> <span class="current-date"></span></p>
         </div>
       </div>
       <div class="row margin-bottom">
-        <div class="col-md-7">
+        <div class="col-md-7 no-padding-left">
           <div class="train-container border-radius">
             <div class="row">
               <div class="col-md-2 no-padding-right">
@@ -98,7 +98,7 @@ layout: default
             </div>
           </div>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-5 no-padding-left no-padding-right">
           <div class="border-radius birthday-container">
             <div class="row">
               <div class="col-md-2">
@@ -118,7 +118,7 @@ layout: default
       <div class="row weather">
         <!--<div class="col-md-1"></div>-->
         {% endif %}
-        <div {% if site.data.cities.size == 1 %} class="col-md-12" {% else %} class="col-md-6" {% endif %}>
+        <div {% if site.data.cities.size == 1 %} class="col-md-12" {% else %} class="col-md-6 no-padding-left {% if modulo == '1' %} no-padding-right {% endif %}" {% endif %}>
           <div class="weather-container border-radius {{city.name}}">
             <div class="row">
               <div class="col-md-8">
