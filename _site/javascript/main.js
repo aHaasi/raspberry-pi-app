@@ -8,7 +8,7 @@ var translation = [
     {en: "thunderstorm", de: "Gewitter", colorCls: "weather-thunder"},
     {en: "snow", de: "Schnee", colorCls: "weather-snow"},
     {en: "mist", de: "Nebel", colorCls: "weather-snow"},
-    {en: "light rain", de: "Leichter Regen", colorCls: "weather-sunny"},
+    {en: "light rain", de: "Leichter Regen", colorCls: "weather-rainy"},
     {en: "overcast clouds", de: "Dichte Wolkendecke", colorCls: "weather-cloudy"}
 ];
 var millisecondsToWaitWeather = 900000;
