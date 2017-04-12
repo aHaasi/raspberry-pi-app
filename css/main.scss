@@ -40,7 +40,7 @@ $element-color9: #5371A9;
 $element-color10: #007F97;
 $element-color11: #00707F;
 
-$weather-sunny: #ffce41;
+$weather-sunny: #ffc82c;
 $weather-rainy: #5371A9;
 $weather-cloudy: #529acc;
 $weather-thunder: #474768;
@@ -72,104 +72,119 @@ body{
   background-color: $background-color;
 }
 p{
-  color: white
+  color: white;
+  font-weight: bold;
 }
-.no-padding-left{
+.container{
+  padding-right: 0px;
   padding-left: 0px;
 }
+.no-padding-left{
+padding-left: 0px;
+}
 .no-padding-right{
-  padding-right: 0px;
+padding-right: 0px;
 }
 .margin-top{
-  margin-top: 20px;
+margin-top: 20px;
 }
 .small-margin-top{
-  margin-top: 10px;
+margin-top: 10px;
 }
 .small-margin-left{
-  margin-left: 10px;
+margin-left: 10px;
 }
 .margin-bottom{
-  margin-bottom: 20px;
+margin-bottom: 20px;
 }
 .white-color{
-  color: white;
+color: white;
 }
 .border-left-side{
-  border-left: 1px solid;
-  color: white;
+border-left: 1px solid;
+color: white;
 }
 .border-radius{
-  border-radius: 10px;
-}
-.current-date{
-  font-size: 15px;
-  color: $element-color11;
-}
-.current-time{
-  font-size: 25px;
-  color: $element-color10;
+border-radius: 10px;
 }
 
+//Time
+.current-date{
+font-size: 20px;
+color: $element-color11;
+}
+.current-time{
+font-size: 35px;
+color: $element-color10;
+}
+
+//Weather
 .weather-font{
-  font-weight: bold;
-  font-size: 30px;
+font-weight: bold;
+font-size: 30px;
 }
 .big-font{
-  font-weight: bold;
-  font-size: 20px;
+font-weight: bold;
+font-size: 20px;
 }
 .center-block {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+display: block;
+margin-left: auto;
+margin-right: auto;
 }
 
 .weather-container{
-  background-color: $element-color2;
-  padding: 10px;
+background-color: $element-color2;
+padding: 10px;
 }
 .Berlin{
-  background-color: $element-color9;
+background-color: $element-color9;
 }
+
+//Birthday
 .birthday-container{
-  padding: 10px;
-  background-color: $element-color8;
+padding: 10px;
+background-color: $element-color8;
 }
 .currentBirthday{
-  margin-top: 5px;
+margin-top: 5px;
 }
+.birthday-people{
+color: $background-color;
+}
+
+//Train container
 .train-container{
-  background-color: $element-color1;
-  padding: 10px;
+background-color: $element-color1;
+padding: 10px;
 }
 .train-container .train-connection{
-  border-style: solid;
-  margin: 5px;
-  border-width: 1px;
-  color: white;
-  padding: 10px 5px 5px 10px;
+border-style: solid;
+margin: 5px;
+border-width: 1px;
+color: white;
+padding: 10px 5px 5px 10px;
 }
 .red-color{
-  color: red;
+color: red;
 }
 .green-color{
-  color: green;
+color: green;
 }
 
 //Weather background
 .weather-sunny{
-  background-color: $weather-sunny;
+background-color: $weather-sunny;
 }
 .weather-rainy{
-  background-color: $weather-rainy;
+background-color: $weather-rainy;
 }
 .weather-cloudy{
-  background-color: $weather-cloudy;
+background-color: $weather-cloudy;
 }
 .weather-thunder{
-  background-color: $weather-thunder;
+background-color: $weather-thunder;
 }
 .weather-snow{
-  background-color: $weather-snow;
+background-color: $weather-snow;
 }

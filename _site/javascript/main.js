@@ -297,6 +297,8 @@ function getCurrentTrains(departure, arrival, cityName, departureStationId, othe
     }
 
     $('.train-details').empty();
+    $('.train-details').append(getEmptyTrainText());
+
     $.ajax({
         url: 'http://localhost/currentTrains.php?id='+departureStationId,
         success: function(data) {
@@ -304,6 +306,10 @@ function getCurrentTrains(departure, arrival, cityName, departureStationId, othe
 
         }
     });
+}
+
+function getEmptyTrainText(){
+    return '<div class="train-connection border-radius"><p>Aktuell liegen keine Daten über diese Zugverbindung vor</p></div>';
 }
 
 function setTrainInterval(departure, arrival, cityName, arrivalStationId){
@@ -526,6 +532,7 @@ function removeUnusedString(str){
  */
 function appendTrainDataToContainer(trainData){
     if(trainData !== null){
+        $('.train-details').empty();
         var container = getTrainConnectionContainer(trainData);
         $('.train-details').append(container);
     }
