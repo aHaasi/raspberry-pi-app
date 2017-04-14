@@ -2,11 +2,11 @@
   weatherId: 2807344
   stationId: 008010382
   stationType: departure
-  stationName: Wittenberge
+  mainStationName: Wittenberge
 
 - name: Berlin
   weatherId: 7290254
   stationId:
   stationType: arrival
-  stationName: Berlin Hbf
-  otherStations: Cottbus
+  mainStationName: Berlin Hbf
+  searchedTrainStations: Cottbus

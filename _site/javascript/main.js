@@ -423,6 +423,10 @@ function getIdOfTrain(children){
  * @param trains
  */
 function requestTrainDetails(trains){
+    $('.train-details').empty();
+    if(trains.length === 0){
+        $('.train-details').append(getEmptyTrainText());
+    }
     for(var i=0; i<trains.length; i++){
         var sendData = trains[i];
 
@@ -443,6 +447,9 @@ function requestTrainDetails(trains){
                     if(children){
                         var startStation = getDataOfStation(departureStation, children, true);
                         var endStation = getDataOfStation(arrivalStation, children, false);
+                        if(endStation === null){
+                            endStation = getDataOfStation(searchedCity, children, false);
+                        }
                         trainDetails = {
                             id: data.id,
                             startStation: startStation,
@@ -489,6 +496,7 @@ function getDataOfStation(stationName, children, isDeparture){
             return data;
         }
     }
+    return null;
 }
 
 /**
@@ -532,7 +540,6 @@ function removeUnusedString(str){
  */
 function appendTrainDataToContainer(trainData){
     if(trainData !== null){
-        $('.train-details').empty();
         var container = getTrainConnectionContainer(trainData);
         $('.train-details').append(container);
     }
@@ -545,12 +552,12 @@ function appendTrainDataToContainer(trainData){
  */
 function getTrainConnectionContainer(trainData){
     var startStationDelay = '';
-    if(trainData.startStation.delay){
+    if(trainData.startStation && trainData.startStation.delay){
         var delayColor = getColorOfDelay(trainData.startStation.delay);
         startStationDelay = '<span class="departureDelay '+ delayColor +'">'+ trainData.startStation.delay +'</span>';
     }
     var endStationDelay = '';
-    if(trainData.endStation.delay){
+    if(trainData.endStation && trainData.endStation.delay){
         var delayColor = getColorOfDelay(trainData.endStation.delay);
         endStationDelay = '<span class="arrivalDelay '+ delayColor +'">'+ trainData.endStation.delay +'</span>';
     }

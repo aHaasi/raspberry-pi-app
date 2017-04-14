@@ -6,7 +6,7 @@ layout: default
     $( document ).ready(function() {
         //weather
 
-        var departureStation, arrivalStation, searchedCity, departureStationId, otherStations;
+        var departureStation, arrivalStation, searchedCity, departureStationId, searchedTrainStations;
         {% for city in site.data.cities %}
           getWeather("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{city.weatherId}}", "{{city.name}}");
           setWeatherInterval("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{city.weatherId}}", "{{city.name}}");
@@ -15,20 +15,20 @@ layout: default
           setForecastIntervall("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{city.weatherId}}", "{{city.name}}");
 
           if("departure" === "{{city.stationType}}"){
-              departureStation = "{{city.stationName}}";
+              departureStation = "{{city.mainStationName}}";
               departureStationId = "{{city.stationId}}";
           }else{
-            arrivalStation = "{{city.stationName}}";
+            arrivalStation = "{{city.mainStationName}}";
             searchedCity = "{{city.name}}";
-            otherStations = "{{city.otherStations}}";
+            searchedTrainStations = "{{city.searchedTrainStations}}";
           }
         {% endfor %}
 
         getCurrentBirthday('{{site.data.birthdays.birthdays}}');
         setBirthdayInterval('{{site.data.birthdays.birthdays}}');
 
-        getCurrentTrains(departureStation, arrivalStation, searchedCity, departureStationId, otherStations);
-        setTrainInterval(departureStation, arrivalStation, searchedCity, departureStationId, otherStations);
+        getCurrentTrains(departureStation, arrivalStation, searchedCity, departureStationId, searchedTrainStations);
+        setTrainInterval(departureStation, arrivalStation, searchedCity, departureStationId, searchedTrainStations);
 
         setCurrentDateTime();
         setCurrentDateTimeInterval();
