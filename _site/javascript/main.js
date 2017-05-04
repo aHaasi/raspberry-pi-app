@@ -202,13 +202,10 @@ function getCurrentBirthday(birthdays){
     var todayDate = todayISO.substring(0, todayISO.indexOf('T'));
     var yearOfToday = today.getUTCFullYear();
     var people = getBirthdayPeople(birthdayArray, todayDate);
-    var text = 'Heute ';
     if(people.length > 1){
         $(".birthday-start-text").text('Heute haben ');
-        // text += 'haben ';
     }else{
         $(".birthday-start-text").text('Heute hat ');
-        // text += 'hat niemand';
     }
     var names = '';
     for(var i=0; i<people.length; i++){
@@ -337,14 +334,16 @@ function getTrains(data){
                 if(checkSearchedTrainStationIsIn(searchedCity, child.children)){
                     dataList.push({
                         id: removeReturnCharacter(getIdOfTrain(child.children)),
-                        url: getUrlOfTrain(child.children)
+                        url: getUrlOfTrain(child.children),
+                        time: getTimeOfTrain(child.children)
                     });
                 }else{
                     for(var j=0; j<otherStationsArray.length; j++){
                         if(checkSearchedTrainStationIsIn(otherStationsArray[j], child.children)){
                             dataList.push({
                                 id: removeReturnCharacter(getIdOfTrain(child.children)),
-                                url: getUrlOfTrain(child.children)
+                                url: getUrlOfTrain(child.children),
+                                time: getTimeOfTrain(child.children)
                             });
                         }
                     }
@@ -352,7 +351,7 @@ function getTrains(data){
             }
         }
     }
-    return dataList;
+    return dataList.sort(compare);
 
 }
 
@@ -416,6 +415,35 @@ function getIdOfTrain(children){
         }
     }
     return null;
+}
+
+/**
+ * Get the current arrival time of train.
+ * @param children
+ * @returns {*}
+ */
+function getTimeOfTrain(children){
+    for(var i=0; i<children.length; i++){
+        var child = children[i];
+        if(child.className === "time"){
+            return child.innerHTML;
+        }
+    }
+    return null;
+}
+
+/**
+ * Compare the train objects by parameter time.
+ * @param a
+ * @param b
+ * @returns {number}
+ */
+function compare(a,b) {
+    if (a.time < b.time)
+        return -1;
+    if (a.time > b.time)
+        return 1;
+    return 0;
 }
 
 /**
