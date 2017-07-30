@@ -309,9 +309,9 @@ function getEmptyTrainText(){
     return '<div class="train-connection border-radius"><p>Aktuell liegen keine Daten über diese Zugverbindung vor</p></div>';
 }
 
-function setTrainInterval(departure, arrival, cityName, arrivalStationId){
+function setTrainInterval(departure, arrival, cityName, arrivalStationId, otherStations){
     setInterval(function() {
-        getCurrentTrains(departure, arrival, cityName, arrivalStationId);
+        getCurrentTrains(departure, arrival, cityName, arrivalStationId, otherStations);
     }, millisecondsTrains);
 }
 
@@ -337,7 +337,7 @@ function getTrains(data){
                         url: getUrlOfTrain(child.children),
                         time: getTimeOfTrain(child.children)
                     });
-                }else{
+                }else if(otherStationsArray){
                     for(var j=0; j<otherStationsArray.length; j++){
                         if(checkSearchedTrainStationIsIn(otherStationsArray[j], child.children)){
                             dataList.push({
@@ -438,7 +438,11 @@ function getTimeOfTrain(children){
  * @param b
  * @returns {number}
  */
-function compare(a,b) {
+function compare(a, b) {
+    var aTime = a.time.toString();
+    var bTime = b.time.toString();
+    a.time = parseFloat(aTime.replace(':', '.'));
+    b.time = parseFloat(bTime.replace(':', '.'));
     if (a.time < b.time)
         return -1;
     if (a.time > b.time)
@@ -475,9 +479,10 @@ function requestTrainDetails(trains){
                     if(children){
                         var startStation = getDataOfStation(departureStation, children, true);
                         var endStation = getDataOfStation(arrivalStation, children, false);
-                        if(endStation === null){
-                            endStation = getDataOfStation(searchedCity, children, false);
-                        }
+                        //Need this any more?
+                        // if(endStation === null){
+                        //     endStation = getDataOfStation(searchedCity, children, false);
+                        // }
                         trainDetails = {
                             id: data.id,
                             startStation: startStation,
