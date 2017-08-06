@@ -9,7 +9,8 @@ var translation = [
     {en: "snow", de: "Schnee", colorCls: "weather-snow"},
     {en: "mist", de: "Nebel", colorCls: "weather-snow"},
     {en: "light rain", de: "Leichter Regen", colorCls: "weather-rainy"},
-    {en: "overcast clouds", de: "Dichte Wolkendecke", colorCls: "weather-cloudy"}
+    {en: "overcast clouds", de: "Dichte Wolkendecke", colorCls: "weather-cloudy"},
+    {en: "light intensity shower rain", de: "Regenschauer", colorCls: "weather-rainy"}
 ];
 var millisecondsToWaitWeather = 900000;
 var millisecondsTrains = 120000;
@@ -483,12 +484,15 @@ function requestTrainDetails(trains){
                         // if(endStation === null){
                         //     endStation = getDataOfStation(searchedCity, children, false);
                         // }
-                        trainDetails = {
-                            id: data.id,
-                            startStation: startStation,
-                            endStation: endStation
-                        };
-                        appendTrainDataToContainer(trainDetails);
+                        if(endStation !== null){
+                            trainDetails = {
+                                id: data.id,
+                                startStation: startStation,
+                                endStation: endStation
+                            };
+                            appendTrainDataToContainer(trainDetails);
+                        }
+
                     }
                 }
             }
