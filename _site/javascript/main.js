@@ -469,6 +469,7 @@ function requestTrainDetails(trains){
             data      : sendData, //Forms name
             dataType  : 'json',
             success   : function(data) {
+                console.log('details', data);
                 var htmlElem = data.html;
                 var start = htmlElem.indexOf('<table class="result stboard train"');
                 var end = htmlElem.indexOf('</table>', htmlElem.indexOf('<table class="result stboard train"'));
