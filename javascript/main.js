@@ -1,3 +1,9 @@
+/**
+ * Version 1.0
+ * Shows the trains, weather, birthdays
+ *
+ */
+
 var translation = [
     {en: "clear sky", de: "Blauer Himmel", colorCls: "weather-sunny"},
     {en: "few clouds", de: "Wenig bewölkt", colorCls: "weather-cloudy"},
