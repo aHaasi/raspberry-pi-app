@@ -17,6 +17,7 @@ var millisecondsTrains = 120000;
 var millisecondsForTime = 10000;
 var millisecondsToWaitBirthday = 600000;
 var departureStation, arrivalStation, searchedCity, otherStationsArray;
+var millisecondsToWaitToDos = 120000;
 
 // For todays date;
 Date.prototype.today = function () {
@@ -630,10 +631,270 @@ function getColorOfDelay(delay){
     return 'green-color';
 }
 
+
+/**
+ * Trello - ToDos
+ */
+
+
+function setToDoTimeInterval(){
+    setInterval(function() {
+        trelloLogin();
+    }, millisecondsToWaitToDos);
+}
+
+function trelloLogin(){
+    var authenticationSuccess = function() {
+        console.log('Successful authentication');
+        getListsOfBoard('5965f1f9bd7eae62b37e2ccb');
+    };
+
+    var authenticationFailure = function() {
+        console.log('Failed authentication');
+    };
+
+    window.Trello.authorize({
+        type: 'popup',
+        name: 'Getting Started Application',
+        scope: {
+            read: 'true',
+            write: 'true' },
+        expiration: 'never',
+        success: authenticationSuccess,
+        error: authenticationFailure
+    });
+}
+
+function getListsOfBoard(id){
+    //'5965f1f9bd7eae62b37e2ccb'
+    var success = function (data) {
+        //load the lists of the board
+        getCardsOfLists(data.lists);
+    };
+
+    window.Trello.boards.get(id, {fields: ['id', 'name'], lists: 'open', list_fields: ['id', 'name']}, success);
+}
+
+/**
+ * Request the cards of a list.
+ * @param lists
+ */
+function getCardsOfLists(lists){
+    var cardList = [];
+
+    for(var i=0; i<lists.length; i++){
+        var list = lists[i];
+        cardList.push({
+            listId: list.id,
+            listName: list.name,
+            wasFilled: false,
+            cards: []
+        });
+
+        (function(listId){
+            var success = function (data) {
+                addCardsToList(cardList, listId, data);
+                if(checkAllWasFilled(cardList)){
+                    //all cards was filled
+                    //search cards with due day today
+                    getCardsDueToday(cardList);
+                }
+
+            };
+            window.Trello.get('/lists/'+ list.id + '/cards', {fields: ['id', 'name', 'badges', 'idMembers', 'idChecklists', 'idList']}, success);
+
+        })(list.id);
+    }
+}
+
+/**
+ * Add the card to the list.
+ * @param cardList
+ * @param listId
+ * @param items
+ */
+function addCardsToList(cardList, listId, items){
+    for(var i=0; i<cardList.length; i++){
+        var cardListItem = cardList[i];
+        if(cardListItem.listId === listId){
+            cardListItem.wasFilled = true;
+            for(var j=0; j<items.length; j++){
+                cardListItem.cards.push(items[j]);
+            }
+        }
+    }
+}
+
+/**
+ * Check if the card list was filled with the cards.
+ * @param cardList
+ * @returns {boolean}
+ */
+function checkAllWasFilled(cardList){
+    var wasFilled = true;
+    for(var i=0; i<cardList.length; i++){
+        wasFilled = cardList[i].wasFilled && wasFilled;
+    }
+    return wasFilled;
+}
+
+/**
+ * Get all the cards with due date is today.
+ * @param cardList
+ */
+function getCardsDueToday(cardList){
+    var cardListToday = [];
+    var today = new Date();
+    var checkListWasInCard = false;
+
+    for(var i=0; i<cardList.length; i++){
+        var cardItem = cardList[i];
+        var cards = cardItem.cards;
+
+        for(var j=0; j<cards.length; j++){
+            var card = cards[j];
+            if(card.badges.due!== null){
+                var cardDay = new Date(card.badges.due);
+                if(today.toDateString() === cardDay.toDateString()){
+                    //add to list
+                    addTodayCardToList(cardListToday, card, cardItem.listId, cardItem.listName);
+                    if(card.idChecklists && card.idChecklists.length > 0){
+                        //request the checklists
+                        getCheckListOfCard(card, cardListToday);
+                        checkListWasInCard = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if(!checkListWasInCard){
+        //we have no checklist and can insert the cards to index html
+        //if we have checklist we have to request the list and insert after request
+        addTodoContainer(cardListToday);
+    }
+
+}
+
+/**
+ * Add a card to a list of all cards today.
+ * @param list
+ * @param card
+ * @param listId
+ * @param listName
+ */
+function addTodayCardToList(list, card, listId, listName){
+    if(list.length > 0){
+        for(var i=0; i<list.length; i++){
+            var currentList = list[i];
+            if(currentList.id === listId){
+                currentList.cards.push(card);
+            }else if(i== list.length -1){
+                list.push({
+                    id: listId,
+                    name: listName,
+                    cards: [card]
+                });
+            }
+        }
+    }else{
+        list.push({
+            id: listId,
+            name: listName,
+            cards: [card]
+        });
+    }
+}
+
+function getCheckListOfCard(card, cardListToday){
+    if(!card.checkLists || card.checkLists === null){
+        card.checkList = [];
+    }
+    card.checkListWasFilled = false;
+
+    var checkLists = card.idChecklists;
+    for(var i=0; i<checkLists.length; i++){
+        var checkListId = checkLists[i];
+
+        (function(checkListId, cardItemIndex, cardList){
+            var success = function (data) {
+                card.checkList.push(data);
+
+                if(cardItemIndex === checkLists.length -1 ){
+                    card.checkListWasFilled = true;
+                }
+                if(wasCardFilledWithChecklist(cardList) && cardItemIndex === checkLists.length -1){
+                    //it was the last card and last checklist -> render it in index html
+                    addTodoContainer(cardList);
+                }
+            };
+            window.Trello.checklists.get(checkListId, {fields: ['id', 'name']}, success);
+
+        })(checkListId, i, cardListToday);
+    }
+}
+
+function wasCardFilledWithChecklist(cardListToday){
+    var wasFilledConpletely = true;
+    for(var i=0; i<cardListToday.length; i++){
+        var cardItem = cardListToday[i];
+        var cards = cardItem.cards;
+
+        for(var j=0; j<cards.length; j++){
+            var card = cards[j];
+            wasFilledConpletely = wasFilledConpletely && card.checkListWasFilled;
+        }
+    }
+    return wasFilledConpletely;
+}
+
+function addTodoContainer(cardListToday){
+    $('.todo-container-details').empty();
+
+    if(cardListToday.length === 0){
+        var emptyContainer = '<div class="row todos"><div class="col-md-12"><p><b>Heute gibt es keine ToDos</b></p></div></div>';
+        $('.todo-container-details').append(emptyContainer);
+    }else{
+        for(var i=0; i<cardListToday.length; i++){
+            var cards = cardListToday[i].cards;
+            for(var j=0; j<cards.length; j++){
+                var card = cards[j];
+                var checkListContainer = '';
+                if(card.checkList && card.checkList.length > 0){
+                    checkListContainer = getCheckListsAsContainer(card.checkList);
+
+                }
+                var container = '<div class="row todos"><div class="col-md-12"><p><b>'+ card.name + ' (' + cardListToday[i].name+ ')</b></p>'+ checkListContainer + '</div></div>';
+                $('.todo-container-details').append(container);
+            }
+        }
+    }
+
+}
+
+function getCheckListsAsContainer(checkLists){
+    var containerList = '<ul>';
+    for(var i=0; i<checkLists.length; i++){
+        var checkList = checkLists[i];
+        var checkItems = checkList.checkItems;
+        for(var j=0; j<checkItems.length; j++){
+            var item = checkItems[j];
+            if(item.state === 'incomplete'){
+                containerList += '<li> <p>'+ item.name +'</p> </li>';
+            }
+
+        }
+    }
+    containerList += '</ul>';
+    return containerList;
+}
+
 $( document ).ready(function() {
     $('.pull-down').each(function() {
         var $this=$(this);
         $this.css('margin-top', $this.parent().height()-$this.height())
     });
+
+    trelloLogin();
 
 });

@@ -449,7 +449,7 @@ pre {
     color: #099; }
 
 body {
-  background-color: #20253D; }
+  background-color: #383838; }
 
 p {
   color: white;
@@ -556,3 +556,22 @@ p {
 
 .weather-snow {
   background-color: #9ad3d6; }
+
+.todo-container {
+  padding: 10px;
+  background-color: #52C7C9; }
+
+.todo-container .todos {
+  border-style: solid;
+  margin: 5px;
+  border-width: 1px;
+  color: white;
+  padding: 10px 5px 5px 10px;
+  border-radius: 10px; }
+
+.todos p {
+  margin-bottom: 0px;
+  font-weight: bold; }
+
+.todo-container-details ul {
+  margin-bottom: 0px; }
