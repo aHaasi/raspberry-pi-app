@@ -32,8 +32,6 @@
         <script>
     $( document ).ready(function() {
         //weather
-
-        var departureStation, arrivalStation, searchedCity, departureStationId, searchedTrainStations;
         
           getWeather("http://api.openweathermap.org/data/2.5", "eb1e418cf98ab04a1bb5d5b188f2a257", "2807344", "Wittenberge");
           setWeatherInterval("http://api.openweathermap.org/data/2.5", "eb1e418cf98ab04a1bb5d5b188f2a257", "2807344", "Wittenberge");
@@ -97,12 +95,32 @@
           </div>
         </div>
       </div>
+      <div class="row margin-bottom">
+        <div class="col-md-7 no-padding-left">
+          <div class="border-radius todo-container">
+            <div class="row">
+              <div class="col-md-2">
+                <img class="small-margin-left" src="images/icons/24/todos.png"/>
+              </div>
+              <div class="col-md-8">
+                <p>Heutigen ToDos</p>
+              </div>
+            </div>
+            <div class="todo-container-details">
+              <div class="row todos">
+                <div class="col-md-12">
+                  <p><b>Heute gibt es keine ToDos</b></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       
         
         
       <div class="row weather">
-        <!--<div class="col-md-1"></div>-->
         
         <div  class="col-md-5 no-padding-left" >
           <div class="weather-container border-radius Wittenberge">

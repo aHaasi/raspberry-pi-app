@@ -5,8 +5,6 @@ layout: default
 <script>
     $( document ).ready(function() {
         //weather
-
-        var departureStation, arrivalStation, searchedCity, departureStationId, searchedTrainStations;
         {% for city in site.data.cities %}
           getWeather("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{city.weatherId}}", "{{city.name}}");
           setWeatherInterval("{{site.data.weather.api-url}}", "{{site.data.weather.api-key}}", "{{city.weatherId}}", "{{city.name}}");
@@ -42,7 +40,7 @@ layout: default
           <div class="border-radius todo-container">
             <div class="row">
               <div class="col-md-2">
-                <img class="small-margin-left" src="images/icons/24/checklist.png"/>
+                <img class="small-margin-left" src="images/icons/24/todos.png"/>
               </div>
               <div class="col-md-8">
                 <p>Heutigen ToDos</p>
@@ -70,12 +68,32 @@ layout: default
           </div>
         </div>
       </div>
+      <div class="row margin-bottom">
+        <div class="col-md-7 no-padding-left">
+          <div class="border-radius todo-container">
+            <div class="row">
+              <div class="col-md-2">
+                <img class="small-margin-left" src="images/icons/24/todos.png"/>
+              </div>
+              <div class="col-md-8">
+                <p>Heutigen ToDos</p>
+              </div>
+            </div>
+            <div class="todo-container-details">
+              <div class="row todos">
+                <div class="col-md-12">
+                  <p><b>Heute gibt es keine ToDos</b></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {% for city in site.data.cities %}
         {% capture modulo %}{{ forloop.index0 | modulo:2 }}{% endcapture %}
         {% if modulo == '0' %}
       <div class="row weather">
-        <!--<div class="col-md-1"></div>-->
         {% endif %}
         <div {% if site.data.cities.size == 1 %} class="col-md-5 no-padding-left" {% else %} class="col-md-6 no-padding-left" {% endif %}>
           <div class="weather-container border-radius {{city.name}}">

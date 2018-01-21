@@ -18,6 +18,8 @@ var millisecondsForTime = 10000;
 var millisecondsToWaitBirthday = 600000;
 var departureStation, arrivalStation, searchedCity, otherStationsArray;
 var millisecondsToWaitToDos = 120000;
+var garbageCalendar = [];
+var monthMapping = {'Januar': 0, 'Februar': 1, 'März': 2, 'April': 3, 'Mai': 4, 'Juni': 5, 'Juli': 6, 'August': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Dezember': 11};
 
 // For todays date;
 Date.prototype.today = function () {
@@ -784,26 +786,20 @@ function getCardsDueToday(cardList){
  * @param listName
  */
 function addTodayCardToList(list, card, listId, listName){
-    if(list.length > 0){
-        for(var i=0; i<list.length; i++){
-            var currentList = list[i];
-            if(currentList.id === listId){
-                currentList.cards.push(card);
-            }else if(i== list.length -1){
-                list.push({
-                    id: listId,
-                    name: listName,
-                    cards: [card]
-                });
-            }
+    for(var i=0; i<list.length; i++){
+        var currentList = list[i];
+        if(currentList.id === listId){
+            currentList.cards.push(card);
+            return;
         }
-    }else{
-        list.push({
-            id: listId,
-            name: listName,
-            cards: [card]
-        });
     }
+
+    //insert new element if that wasn't insert before
+    list.push({
+        id: listId,
+        name: listName,
+        cards: [card]
+    });
 }
 
 function getCheckListOfCard(card, cardListToday){
@@ -889,6 +885,91 @@ function getCheckListsAsContainer(checkLists){
     return containerList;
 }
 
+//-----------get the garbage picking up
+
+function requestGarbagePickingUpOfYear(){
+    $.ajax({
+        url: 'http://localhost/garbageOfYear.php',
+        success: function(data) {
+            saveGarbagePickingUpOfYear(data);
+
+        }
+    });
+}
+
+function saveGarbagePickingUpOfYear(data){
+    var el = $(data);
+    var calendarHtml = $(el).children('.awk-ui-widget-html').children();
+
+    $(calendarHtml).each(function() {
+       if($( this ).attr("class") === 'awk-ui-widget-html-monat'){
+           /*var month = $( this ).text();
+           var splitMonth = month.split(' ');
+           garbageCalendar.push({
+               'month': splitMonth[0],
+               'days': []
+           })*/
+       }else if($( this ).hasClass('awk-ui-widget-html-termin')){
+           var monthName = $( this ).prevAll('.awk-ui-widget-html-monat').text();
+           var day = $( this ).children('.awk-ui-widget-html-termin-tag').text();
+           var garbageType = $( this ).children('.awk-ui-widget-html-termin-bez').text();
+           //toDo check if day is empty: take the elem before
+           var date = new Date();
+           date.setDate(parseInt(day));
+           var splitMonthName = monthName.split(' ');
+           date.setMonth(monthMapping[splitMonthName[0]]);
+           var data = {
+               date: date,
+               garbageType: garbageType
+           };
+           //addDayOfGarbagePickingUp(splitMonthName[0], data);
+           addDayToGarbageArray(date, garbageType);
+       }
+    });
+    console.log('-----garbageCalendar', garbageCalendar);
+
+}
+
+function addDayOfGarbagePickingUp(monthName, data){
+    for(var i=0; i<garbageCalendar.length; i++){
+        var currentMonth = garbageCalendar[i];
+        if(currentMonth.month === monthName){
+            currentMonth.days.push(data);
+            return;
+        }
+    }
+}
+
+function addDayToGarbageArray(day, garbageType){
+    for(var i=0; i<garbageCalendar.length; i++){
+        var currentElem = garbageCalendar[i];
+        if(currentElem.garbageType === garbageType){
+            currentElem.days.push(day);
+            return;
+        }
+    }
+
+    //nothing was inserted, than add element
+    garbageCalendar.push({
+        garbageType: garbageType,
+        days: [day]
+    });
+}
+
+function initializeGarbageCalendar(){
+    garbageCalendar = [];
+    addGarbageTypeToCalendar('Hausmüll');
+    addGarbageTypeToCalendar('Leichtverpackungen (gelber Sack)');
+    addGarbageTypeToCalendar('Papier, Pappe, Kartonagen');
+}
+
+function addGarbageTypeToCalendar(type){
+    garbageCalendar.push({
+        garbageType: type,
+        days: []
+    });
+}
+
 $( document ).ready(function() {
     $('.pull-down').each(function() {
         var $this=$(this);
@@ -896,5 +977,7 @@ $( document ).ready(function() {
     });
 
     trelloLogin();
+    initializeGarbageCalendar();
+    requestGarbagePickingUpOfYear();
 
 });
