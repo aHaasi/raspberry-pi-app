@@ -915,29 +915,30 @@ function saveGarbagePickingUpOfYear(data){
            var garbageType = $( this ).children('.awk-ui-widget-html-termin-bez').text();
            //toDo check if day is empty: take the elem before
            var date = new Date();
+           date.setHours(0,0,0,0);
            date.setDate(parseInt(day));
            var splitMonthName = monthName.split(' ');
            date.setMonth(monthMapping[splitMonthName[0]]);
-           var data = {
-               date: date,
-               garbageType: garbageType
-           };
-           //addDayOfGarbagePickingUp(splitMonthName[0], data);
            addDayToGarbageArray(date, garbageType);
        }
     });
-    console.log('-----garbageCalendar', garbageCalendar);
+    $('.garbage-container-details').empty();
+    var garbageTomorrow = [];
+    var garbageToday = [];
 
-}
+    var garbageOfHausmuell = getNextGarbageMeeting('Hausmüll', 2);
+    var garbageContainerHausmuell = getGarbageNextMeetingContainer(garbageOfHausmuell, 'Hausmüll', garbageTomorrow, garbageToday);
 
-function addDayOfGarbagePickingUp(monthName, data){
-    for(var i=0; i<garbageCalendar.length; i++){
-        var currentMonth = garbageCalendar[i];
-        if(currentMonth.month === monthName){
-            currentMonth.days.push(data);
-            return;
-        }
-    }
+    var garbageOfGelberSack = getNextGarbageMeeting('Leichtverpackungen (gelber Sack)', 2);
+    var garbageContainerGelberSack = getGarbageNextMeetingContainer(garbageOfGelberSack, 'Leichtverpackungen (gelber Sack)', garbageTomorrow, garbageToday);
+
+    var garbageOfPapier = getNextGarbageMeeting('Papier, Pappe, Kartonagen', 2);
+    var garbageContainerPapier = getGarbageNextMeetingContainer(garbageOfPapier, 'Papier, Pappe, Kartonagen', garbageTomorrow, garbageToday);
+
+    var garbageOfTomorrowContainer = getGarbageTomorrowOrTodayContainer(garbageTomorrow, 'Morgen');
+    var garbageOfTodayContainer = getGarbageTomorrowOrTodayContainer(garbageToday, 'Heute');
+    $('.garbage-container-details').append(garbageOfTodayContainer + garbageOfTomorrowContainer + garbageContainerHausmuell + garbageContainerGelberSack + garbageContainerPapier);
+
 }
 
 function addDayToGarbageArray(day, garbageType){
@@ -948,7 +949,6 @@ function addDayToGarbageArray(day, garbageType){
             return;
         }
     }
-
     //nothing was inserted, than add element
     garbageCalendar.push({
         garbageType: garbageType,
@@ -968,6 +968,89 @@ function addGarbageTypeToCalendar(type){
         garbageType: type,
         days: []
     });
+}
+
+function getNextGarbageMeeting(garbageType, numberOfMeetings){
+    var returnedDates = [];
+    var today = new Date();
+    today.setHours(0,0,0,0);
+    var daysOfGarbageMeetings = getDaysOfGarbageMeetings(garbageType);
+    //sort dates?
+    daysOfGarbageMeetings.sort(function(a,b){
+        // Turn your strings into dates, and then subtract them
+        // to get a value that is either negative, positive, or zero.
+        return a-b;
+    });
+    for(var i=0; i<daysOfGarbageMeetings.length; i++){
+        var garbageDate = daysOfGarbageMeetings[i];
+        if(garbageDate.getTime() >= today.getTime() && returnedDates.length < numberOfMeetings){
+            returnedDates.push(garbageDate);
+        }else if(returnedDates.length > numberOfMeetings){
+            return returnedDates;
+        }
+    }
+
+    return returnedDates;
+}
+
+function getDaysOfGarbageMeetings(garbageType){
+    for(var i=0; i<garbageCalendar.length; i++){
+        var currentElem = garbageCalendar[i];
+        if(currentElem.garbageType === garbageType){
+            return currentElem.days;
+        }
+    }
+
+    return null;
+}
+
+function getGarbageTomorrowOrTodayContainer(garbageTypes, text){
+    if(garbageTypes.length === 0){
+        return '';
+    }
+    var garbageTypesInString = '';
+    for(var i=0; i<garbageTypes.length; i++){
+        if(i=== garbageTypes.length-1 ){
+            garbageTypesInString += garbageTypes[i];
+        }else{
+            garbageTypesInString += garbageTypes[i] + ', '
+        }
+
+    }
+
+    return '<div class="row garbage"><div class="col-md-12 text-right garbage-tomorrow">' +
+        '<p><b>' + text + ': '+ garbageTypesInString + '</b></p></div></div>';
+}
+
+function getGarbageNextMeetingContainer(dates, garbageType, garbageTomorrow, garbageToday){
+    var today = new Date();
+    today.setHours(0,0,0,0);
+    var datesInString = '';
+
+    //toDo: Tag vs Tagen
+    for(var i=0; i<dates.length; i++){
+        var diffDays = getDifferentDays(dates[i], today);
+        if(diffDays === 1){
+            //show the garbage of tomorrow in an extra container
+            garbageTomorrow.push(garbageType);
+        }else if(diffDays === 0){
+            garbageToday.push(garbageType);
+        }else{
+            if(i === dates.length - 1){
+                datesInString += ' in ' + getDifferentDays(dates[i], today) +  ' Tagen (' + dates[i].today() + ')';
+            }else{
+                datesInString += ' in ' + getDifferentDays(dates[i], today) +  ' Tagen (' + dates[i].today() + '),';
+            }
+        }
+
+    }
+
+    return '<div class="row garbage"><div class="col-md-12"><p><b>' + garbageType + ':' +  datesInString + '</b></p></div></div>';
+}
+
+function getDifferentDays(date1, date2){
+    var timeDiff = Math.abs(date2.getTime() - date1.getTime());
+   return Math.ceil(timeDiff / (1000 * 3600 * 24));
 }
 
 $( document ).ready(function() {

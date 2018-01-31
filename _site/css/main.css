@@ -575,3 +575,10 @@ p {
 
 .todo-container-details ul {
   margin-bottom: 0px; }
+
+.garbage-container {
+  padding: 10px;
+  background-color: #FC5A4F; }
+
+.garbage-tomorrow {
+  font-size: 25px; }
