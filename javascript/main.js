@@ -930,10 +930,10 @@ function saveGarbagePickingUpOfYear(data){
     var garbageContainerHausmuell = getGarbageNextMeetingContainer(garbageOfHausmuell, 'Hausmüll', garbageTomorrow, garbageToday);
 
     var garbageOfGelberSack = getNextGarbageMeeting('Leichtverpackungen (gelber Sack)', 2);
-    var garbageContainerGelberSack = getGarbageNextMeetingContainer(garbageOfGelberSack, 'Leichtverpackungen (gelber Sack)', garbageTomorrow, garbageToday);
+    var garbageContainerGelberSack = getGarbageNextMeetingContainer(garbageOfGelberSack, 'Leichtverpackungen', garbageTomorrow, garbageToday);
 
     var garbageOfPapier = getNextGarbageMeeting('Papier, Pappe, Kartonagen', 2);
-    var garbageContainerPapier = getGarbageNextMeetingContainer(garbageOfPapier, 'Papier, Pappe, Kartonagen', garbageTomorrow, garbageToday);
+    var garbageContainerPapier = getGarbageNextMeetingContainer(garbageOfPapier, 'Papier', garbageTomorrow, garbageToday);
 
     var garbageOfTomorrowContainer = getGarbageTomorrowOrTodayContainer(garbageTomorrow, 'Morgen');
     var garbageOfTodayContainer = getGarbageTomorrowOrTodayContainer(garbageToday, 'Heute');
@@ -1045,7 +1045,7 @@ function getGarbageNextMeetingContainer(dates, garbageType, garbageTomorrow, gar
 
     }
 
-    return '<div class="row garbage"><div class="col-md-12"><p><b>' + garbageType + ':' +  datesInString + '</b></p></div></div>';
+    return '<div class="row garbage"><div class="col-md-12"><p><b>' + garbageType + ':</b>' +  datesInString + '</p></div></div>';
 }
 
 function getDifferentDays(date1, date2){
