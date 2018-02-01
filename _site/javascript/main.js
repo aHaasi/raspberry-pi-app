@@ -892,7 +892,6 @@ function requestGarbagePickingUpOfYear(){
         url: 'http://localhost/garbageOfYear.php',
         success: function(data) {
             saveGarbagePickingUpOfYear(data);
-
         }
     });
 }
@@ -1051,6 +1050,13 @@ function getGarbageNextMeetingContainer(dates, garbageType, garbageTomorrow, gar
 function getDifferentDays(date1, date2){
     var timeDiff = Math.abs(date2.getTime() - date1.getTime());
    return Math.ceil(timeDiff / (1000 * 3600 * 24));
+}
+
+function setCurrentGarbageInterval() {
+    setInterval(function () {
+        initializeGarbageCalendar();
+        requestGarbagePickingUpOfYear();
+    }, millisecondsToWaitBirthday);
 }
 
 $( document ).ready(function() {
