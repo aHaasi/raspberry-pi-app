@@ -983,13 +983,29 @@ function getNextGarbageMeeting(garbageType, numberOfMeetings){
     for(var i=0; i<daysOfGarbageMeetings.length; i++){
         var garbageDate = daysOfGarbageMeetings[i];
         if(garbageDate.getTime() >= today.getTime() && returnedDates.length < numberOfMeetings){
-            returnedDates.push(garbageDate);
+            //check if date exists already
+            if(!dateExistsInArray(returnedDates, garbageDate)){
+                returnedDates.push(garbageDate);
+            }
         }else if(returnedDates.length > numberOfMeetings){
             return returnedDates;
         }
     }
 
     return returnedDates;
+}
+
+function dateExistsInArray(array, garbageDate){
+    if(array && array.length > 0){
+        for(var i=0; i<array.length; i++){
+            var dateOfArray = array[i];
+            if(dateOfArray.getTime()== garbageDate.getTime()){
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 function getDaysOfGarbageMeetings(garbageType){
