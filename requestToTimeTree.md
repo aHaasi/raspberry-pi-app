@@ -1,1 +1,1 @@
-curl 'https://timetreeapp.com/api/v1/auth/email/signin' -X PUT -H 'content-type: application/json' -H 'x-timetreea: web/1.5.3/de' --data-binary '{"uid":"anne.suendram@mailbox.org","password":"2014MasterTimeTreeok!","uuid":"f04ec860c050475abb42330c633097cc"}' --compressed
+curl 'https://timetreeapp.com/api/v1/auth/email/signin' -X PUT -H 'content-type: application/json' -H 'x-timetreea: web/1.5.3/de' --data-binary '{"uid":"anne.suendram@mailbox.org","password":"!","uuid":"f04ec860c050475abb42330c633097cc"}' --compressed
